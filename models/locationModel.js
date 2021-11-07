@@ -17,6 +17,9 @@ const locationSchema = new Schema({
     }],
     latlon_id : {
         type : String
+    },
+    percentage : {
+        type : Number
     }
 })
 

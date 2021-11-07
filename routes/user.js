@@ -4,12 +4,17 @@ const router = express.Router()
 
 
 
-router.get('/',user.users)    
+router.get('/',user.userById)   
 
-router.post('/',user.createUser)        
+// router.get('/:user_id',user.userById)
 
-// router.put('/',authAdmin,demoteUserToMember)  
+router.post('/',user.createUser)       
 
-// router.delete('/',removeUser)                       
+// router.put('/infected',user.infected)
+
+router.put('/userinfo',user.updateUserInfo)
+router.put('/locations',user.updateLocations)  //na lokaciji
+
+router.delete('/:user_id',user.deleteUser)                       
 
 module.exports = router

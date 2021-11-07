@@ -1,7 +1,10 @@
 const User = require('../models/userModel.js')
 const bcrypt = require('bcrypt')
-const saltRounds = 10;
 
+const token = require('../config/token')
+const saltRounds = 10;
+const location = require('./locationController.js')
+const Location = require('../models/locationModel.js')
 
 const users = (req, res, next) =>{
     User.find({})
@@ -18,7 +21,8 @@ const users = (req, res, next) =>{
 }
 
 const userById = (req, res, next) =>{
-    User.find({ _id: `${req.body.user_id}`})
+
+    User.find({ _id: `${req.query.user_id}`})
     .then(response => {
         res.json({
             response
@@ -57,7 +61,12 @@ const createUser = (req, res, next) =>{
                         credits : 0  
                     },function (errCreate, data) {
                         if (errCreate) console.log(errCreate)
-                        res.send(data)
+                        let jwtoken =token.generateAccessToken(data)
+                        let fin = {
+                            token : jwtoken,
+                            podaci :{data}
+                        }
+                        res.send(fin)
                     
                 })     
             }
@@ -66,7 +75,7 @@ const createUser = (req, res, next) =>{
 })
 }
 const deleteUser= (req, res, next) =>{
-    User.deleteOne({ _id: `${req.body.user_id}` });
+    User.deleteOne({ _id: `${req.params.user_id}` });
 }
 const updateUserInfo = (req, res ,next ) => {
     User.findOneAndUpdate({ _id: `${req.body.user_id}` }, {
@@ -89,24 +98,44 @@ const updateUserInfo = (req, res ,next ) => {
 }
 const updateLocations = (req, res, next) => {
     let user;
-    User.findOne({ _id: `${req.body.user_id}`})
-    .then(response => {
-        user = response
+    User.findOne({ _id: `${req.body.user_id}`}, (err,data) => {
+        console.log(data.locations_visited)
+        if (err) 
+            console.log(err);
+        if(data){
+            var obj = {
+                _id: req.body.latlon_id,                    
+                time_visited: Date()
+            }
+            data.locations_visited.push(obj)
+            var visitors_u = data.locations_visited.filter(element => element.time_visited.getTime() > Date.now() - 432000000)
+            let currpositive
+            if(data.is_positive && positive_date.getTime() > Date.now() - 1000*60*60*14){
+                currpositive = false
+            }
+            User.findOneAndUpdate({ _id: `${req.body.user_id}`}, {'locations_visited' : visitors_u, 'is_positive' : currpositive}, (err,data)=>{
+                if (err) console.log(err)
+                location.createOrUpdateLocation(req,res)
+            })
+        }
     })
-    .catch(error => {
-        res.json({
-            message : `${error}`
-        })
-    })
-    if(user.locations_visited[user.locations_visited.lenght -1].time_visited)
-        console.log("2")
+    
+    
 }
+const updateInfected =  (req, res, next) => {
+    User.findOne({'_id':req.body.user_id},{'is_positive' : true,positive_date: Date()},(err,data)=>{
+        Location.find( {'_id' : {$in: data.locations_visited._id}}, (errloc,dataloc)=>{
+            dataloc.visi
+        })
+    }) 
 
+}
 module.exports ={
     users,
     userById,
     createUser,
     deleteUser,
-    updateUserInfo
+    updateUserInfo,
+    updateLocations
 
 }

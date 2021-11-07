@@ -75,13 +75,10 @@ const createOrUpdateLocation = (req, res, next) => {
     
 }
 
-const updateLocations = (req, res, next) => {
-   
-}
 
 module.exports ={
     locations,
-    updateLocations,
     createOrUpdateLocation,
-    LocationById
+    LocationById,
+    
 }
