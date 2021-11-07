@@ -59,12 +59,12 @@ const createUser = (req, res, next) =>{
                         vaccine_dose_n : 0,
                         locations_visited: [],
                         credits : 0  
-                    },function (errCreate, data) {
+                    },function (errCreate, datat) {
                         if (errCreate) console.log(errCreate)
-                        let jwtoken =token.generateAccessToken(data)
+                        let jwtoken =token.generateAccessToken(datat)
                         let fin = {
                             token : jwtoken,
-                            podaci :{data}
+                            podaci :{datat}
                         }
                         res.send(fin)
                     
@@ -125,7 +125,15 @@ const updateLocations = (req, res, next) => {
 const updateInfected =  (req, res, next) => {
     User.findOne({'_id':req.body.user_id},{'is_positive' : true,positive_date: Date()},(err,data)=>{
         Location.find( {'_id' : {$in: data.locations_visited._id}}, (errloc,dataloc)=>{
-            dataloc.visi
+            let positive = 0
+            dataloc.visitors.forEach(element => { 
+                if(element._id == req.body.user_id)
+                element.is_positive = true
+                if(element.is_positive)
+                    positive++
+            });
+            dataloc.percentage = positive/dataloc.visitors.lenght
+            Location.findOneAndUpdate({'_id':dataloc._id},{'visitors' : true,positive_date: Date()})
         })
     }) 
 

@@ -7,7 +7,9 @@ const router = express.Router()
 
 router.get('/',location.locations)    
 
-router.put('/',location.createOrUpdateLocation)        
+router.post('/manylocations',location.LocationMultiple)
+
+// router.put('/',location.createOrUpdateLocation)        
 
 // router.put('/',authAdmin,demoteUserToMember)  
 

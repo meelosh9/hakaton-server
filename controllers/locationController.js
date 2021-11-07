@@ -16,7 +16,7 @@ const locations = (req, res, next) =>{
 }
 
 const LocationById = (req, res, next) =>{
-    location.find({ _id: `${req.body.location_id}`})
+    Location.find({ _id: `${req.body.location_id}`})
     .then(response => {
         res.json({
             response
@@ -28,6 +28,20 @@ const LocationById = (req, res, next) =>{
         })
     })
 }
+const LocationMultiple = (req, res, next) => {
+    let locations = []
+    let coordinates = req.body.Cubes
+    console.log(typeof coordinates)
+    console.log(Array.isArray(coordinates))
+    req.body.Cubes.forEach(element => {
+        Location.find({ $and: [{'latitude': element.latitude},{'longitude': element.longitude}]},(err,data)=>{
+            locations.push(data)
+        })
+    });
+    res.send(locations)
+
+}
+
 
 const createOrUpdateLocation = (req, res, next) => {            
     Location.findOne({ 'latlon_id' :req.body.latlon_id },function (erru, data) {
@@ -35,7 +49,7 @@ const createOrUpdateLocation = (req, res, next) => {
             console.log(erru);    
         //console.log(!data)  
         if(!data){
-            console.log("zasto??")  
+
             Location.create({
             latitude: req.body.latitude,
             longitude: req.body.longitude,
@@ -46,9 +60,9 @@ const createOrUpdateLocation = (req, res, next) => {
             }],
             percentage_infected:+req.body.is_positive                ,
             latlon_id: `${req.body.latitude}`+`${req.body.longitude}`
-            },function (errCreate, data) {
+            },function (errCreate, dataa) {
                 if (errCreate) console.log(errCreate)
-                res.send(data)
+                res.send(dataa)
                 
             })     
         }
@@ -59,15 +73,15 @@ const createOrUpdateLocation = (req, res, next) => {
                 time_visited:Date(),
                 is_positive: req.body.is_positive
             }
-            console.log(data)
+
             //console.log(data[0].visitors)
             data.visitors.push(obj)                
             var visitors_u = data.visitors.filter(element => element.time_visited.getTime() > Date.now() - 432000000)
             data.visitors = visitors_u
             console.log(visitors_u)
-            Location.findOneAndUpdate({'latlon_id' : data.latlon_id}, {'visitors' : visitors_u}, (err,data)=>{
+            Location.findOneAndUpdate({'latlon_id' : data.latlon_id}, {'visitors' : visitors_u}, (err,dataa)=>{
                 if (err) console.log(err)
-                res.send(data)
+                res.send(dataa)
             })
         }
                 
@@ -80,5 +94,6 @@ module.exports ={
     locations,
     createOrUpdateLocation,
     LocationById,
+    LocationMultiple
     
 }
