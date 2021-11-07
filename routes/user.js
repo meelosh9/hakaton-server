@@ -10,7 +10,7 @@ router.get('/',user.userById)
 
 router.post('/',user.createUser)       
 
-// router.put('/infected',user.infected)
+ router.put('/infected',user.updateInfected)
 
 router.put('/userinfo',user.updateUserInfo)
 router.put('/locations',user.updateLocations)  //na lokaciji

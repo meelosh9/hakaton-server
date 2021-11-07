@@ -123,9 +123,12 @@ const updateLocations = (req, res, next) => {
     
 }
 const updateInfected =  (req, res, next) => {
-    User.findOne({'_id':req.body.user_id},{'is_positive' : true,positive_date: Date()},(err,data)=>{
+    User.findOneAndUpdate({'_id':req.body.user_id},{'is_positive' : true,positive_date: Date()},(err,data)=>{
+        
         Location.find( {'_id' : {$in: data.locations_visited._id}}, (errloc,dataloc)=>{
             let positive = 0
+            console.log(dataloc)
+            if(dataloc == []){
             dataloc.visitors.forEach(element => { 
                 if(element._id == req.body.user_id)
                 element.is_positive = true
@@ -133,7 +136,7 @@ const updateInfected =  (req, res, next) => {
                     positive++
             });
             dataloc.percentage = positive/dataloc.visitors.lenght
-            Location.findOneAndUpdate({'_id':dataloc._id},{'visitors' : true,positive_date: Date()})
+            Location.findOneAndUpdate({'_id':dataloc._id},{'visitors' : true,positive_date: Date()})}
         })
     }) 
 
@@ -144,6 +147,7 @@ module.exports ={
     createUser,
     deleteUser,
     updateUserInfo,
-    updateLocations
+    updateLocations,
+    updateInfected
 
 }

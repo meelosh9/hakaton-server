@@ -30,18 +30,24 @@ const LocationById = (req, res, next) =>{
 }
 const LocationMultiple = (req, res, next) => {
     let locations = []
-    let coordinates = req.body.Cubes
-    console.log(typeof coordinates)
-    console.log(Array.isArray(coordinates))
-    req.body.Cubes.forEach(element => {
-        Location.find({ $and: [{'latitude': element.latitude},{'longitude': element.longitude}]},(err,data)=>{
+    coordinates = JSON.parse(req.body.Cubes)
+    var counter = 0
+    var max = 0
+    console.log(coordinates)
+    coordinates.forEach(element => {
+        max++
+    })
+    coordinates.forEach(element => {
+        Location.find( {'latitude': element.latitude,'longitude': element.longitude},(err,data)=>{
+            
             locations.push(data)
+            counter++
+            if(counter == max)
+                res.send(locations)
         })
     });
-    res.send(locations)
-
+    
 }
-
 
 const createOrUpdateLocation = (req, res, next) => {            
     Location.findOne({ 'latlon_id' :req.body.latlon_id },function (erru, data) {
